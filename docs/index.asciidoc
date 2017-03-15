@@ -1,0 +1,5 @@
+= Rsbeat Docs
+
+Welcome to the Rsbeat documentation.
+
+

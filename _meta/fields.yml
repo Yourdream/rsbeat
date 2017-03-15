@@ -1,0 +1,13 @@
+- key: rsbeat
+  title: rsbeat
+  description:
+  fields:
+    - name: counter
+      type: long
+      required: true
+      description: >
+        PLEASE UPDATE DOCUMENTATION
+    - name: cmd
+      type: keyword
+    - name: key
+      type: text
