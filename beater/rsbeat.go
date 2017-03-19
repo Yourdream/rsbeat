@@ -11,7 +11,6 @@ import (
 
 	"github.com/liugaohua/rsbeat/config"
 	"github.com/garyburd/redigo/redis"
-	"strings"
 )
 
 type Rsbeat struct {
@@ -29,22 +28,13 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	logp.Info("config: %v", config.Redis )
+	logp.Info("config.Redis: %v", config.Redis )
+	logp.Info("config.slowerThan: %v", config.SlowerThan )
 	var poolList = make(map[string]*redis.Pool)
-	var redisList []redisInstance
-	var redisInstance redisInstance
 	for _, ipPort := range  config.Redis {
-		//poolList = append( poolList , poolInit(ipPort ,""))
-		poolList[ipPort] = poolInit( ipPort,"")
+		poolList[ipPort] = poolInit( ipPort,"", config.SlowerThan)
 		logp.Info("redis: %s", ipPort)
-
-		var ipPortArr []string
-		ipPortArr = strings.Split( ipPort , ":")
-		redisInstance.ip = ipPortArr[0]
-		redisInstance.port = ipPortArr[1]
-		redisList = append(redisList, redisInstance)
 	}
-	fmt.Printf("%q\n", redisList )
 	fmt.Printf("%q\n", poolList )
 
 	bt := &Rsbeat{
@@ -85,7 +75,7 @@ func (bt *Rsbeat) Run(b *beat.Beat) error {
 			go bt.redisc( b.Name , true , pool.Get() , ipPort )
 		}
 		bt.lastIndexTime = time.Now()
-		logp.Info("Event sent")
+		logp.Info("Event sent. counter:%d", counter )
 		counter++
 	}
 }
@@ -115,14 +105,15 @@ func (bt *Rsbeat ) redisc( beatname string, init bool, c redis.Conn , ipPort str
 
 	//c.Do("CONFIG", "SET", "slowlog-log-slower-than", "10")
 	//reply , err := redis.Values(c.Do("slowlog", "get", 30 ))
-	c.Send("SLOWLOG", "GET", "30")
+	c.Send("SLOWLOG", "GET", "100")
 	c.Send("SLOWLOG", "RESET")
 	logp.Info("redis: slowlog get. slowlog rest");
 
 	c.Flush()
 	reply, err := redis.Values( c.Receive() ) // reply from GET
-	c.Receive() // reply from SET
+	c.Receive() // reply from RESET
 
+	logp.Info("reply len: %d", len( reply ))
 
 	now := time.Now()
 	for _, i := range reply {
@@ -142,7 +133,7 @@ func (bt *Rsbeat ) redisc( beatname string, init bool, c redis.Conn , ipPort str
 		}
 		t := time.Unix(itemLog.timestamp, 0).UTC()
 		extraTime := t.Format("2006-01-02T15:04:05Z07:00")
-		//t := time.Date( 0, 0, 0, 0, 0, itemLog.timestamp, 0, time.UTC)
+		//extraTime := time.Date( 0, 0, 0, 0, 0, itemLog.timestamp, 0, time.UTC)
 		fmt.Println(itemLog.slowId,t,itemLog.duration,itemLog.cmd, itemLog.key, itemLog.args )
 		event := common.MapStr{
 			//"_id":       itemLog.slowId,
@@ -168,7 +159,7 @@ func (bt *Rsbeat ) redisc( beatname string, init bool, c redis.Conn , ipPort str
 	}
 }
 
-func poolInit(server string , password string ) (*redis.Pool) {
+func poolInit(server string , password string , slowerThan int ) (*redis.Pool) {
 	return &redis.Pool{
 		MaxIdle: 3,
 		IdleTimeout: 240 * time.Second,
@@ -177,7 +168,7 @@ func poolInit(server string , password string ) (*redis.Pool) {
 			if err != nil {
 				return nil, err
 			}
-			c.Do("CONFIG", "SET", "slowlog-log-slower-than", "10")
+			c.Do("CONFIG", "SET", "slowlog-log-slower-than", slowerThan )
 			logp.Info("redis: config set");
 /*			if _, err := c.Do("AUTH", password); err != nil {
 				c.Close()

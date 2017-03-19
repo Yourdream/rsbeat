@@ -8,9 +8,11 @@ import "time"
 type Config struct {
 	Period time.Duration `config:"period"`
 	Redis []string `config:"redis"`
+	SlowerThan int `config:slowerThan`
 }
 
 var DefaultConfig = Config{
 	Period: 1 * time.Second,
 	Redis:  []string{"192.168.33.10:16379"},
+	SlowerThan:  100,//ms
 }

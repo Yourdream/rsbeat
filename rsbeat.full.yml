@@ -6,6 +6,7 @@ rsbeat:
   # Defines how often an event is sent to the output
   period: 3s
   redis: ["192.168.33.10:6379","192.168.33.10:16379"]
+  slowerThan: 100
 
 #================================ General ======================================
 
@@ -92,7 +93,8 @@ output.elasticsearch:
   # Scheme and port can be left out and will be set to the default (http and 9200)
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-  hosts: ["virtualhost:9900"]
+  #hosts: ["virtualhost:9900"]
+  hosts: ["virtualhost:9200"]
 
   # Set gzip compression level.
   #compression_level: 0
