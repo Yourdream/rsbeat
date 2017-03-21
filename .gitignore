@@ -6,3 +6,4 @@
 /rsbeat.test
 *.pyc
 vendor
+logs

@@ -35,7 +35,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		poolList[ipPort] = poolInit( ipPort,"", config.SlowerThan)
 		logp.Info("redis: %s", ipPort)
 	}
-	fmt.Printf("%q\n", poolList )
+	logp.Info("%q\n", poolList )
 
 	bt := &Rsbeat{
 		done: make(chan struct{}),
@@ -59,13 +59,6 @@ func (bt *Rsbeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
-/*		event := common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       b.Name,
-			"counter":    counter,
-		}
-		bt.client.PublishEvent(event)
-		*/
 		for ipPort, pool := range bt.poolList {
 			logp.Info("Event sent instance:%s",ipPort )
 			go bt.redisc( b.Name , true , pool.Get() , ipPort )
@@ -101,7 +94,7 @@ func (bt *Rsbeat ) redisc( beatname string, init bool, c redis.Conn , ipPort str
 
 	//c.Do("CONFIG", "SET", "slowlog-log-slower-than", "10")
 	//reply , err := redis.Values(c.Do("slowlog", "get", 30 ))
-	c.Send("SLOWLOG", "GET", "100")
+	c.Send("SLOWLOG", "GET" )
 	c.Send("SLOWLOG", "RESET")
 	logp.Info("redis: slowlog get. slowlog rest");
 
@@ -130,18 +123,17 @@ func (bt *Rsbeat ) redisc( beatname string, init bool, c redis.Conn , ipPort str
 		t := time.Unix(itemLog.timestamp, 0).UTC()
 		extraTime := t.Format("2006-01-02T15:04:05Z07:00")
 		//extraTime := time.Date( 0, 0, 0, 0, 0, itemLog.timestamp, 0, time.UTC)
-		fmt.Println(itemLog.slowId,t,itemLog.duration,itemLog.cmd, itemLog.key, itemLog.args )
+		//fmt.Println(itemLog.slowId,t,itemLog.duration,itemLog.cmd, itemLog.key, itemLog.args )
 		event := common.MapStr{
 			//"_id":       itemLog.slowId,
-			"type":       beatname,
 			"@timestamp": common.Time(t),
 			"slowId": itemLog.slowId,
-			"duration":   itemLog.duration,
 			"cmd":   itemLog.cmd,
 			"key":	itemLog.key,
 			"args":  itemLog.args,
-			"extraTime": extraTime,
+			"duration":   itemLog.duration,
 			"ipPort":ipPort,
+			"extraTime": extraTime,
 		}
 		if init {
 			// index all files and directories on init
