@@ -4,8 +4,8 @@
 
 rsbeat:
   # Defines how often an event is sent to the output
-  period: 3s
-  redis: ["192.168.33.10:6379","192.168.33.10:16379"]
+  period: 1s
+  redis: ["192.168.33.10:6379"]
   slowerThan: 100
 
 #================================ General ======================================
@@ -93,19 +93,16 @@ output.elasticsearch:
   # Scheme and port can be left out and will be set to the default (http and 9200)
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-  #hosts: ["virtualhost:9900"]
-  hosts: ["virtualhost:9200"]
+  #hosts: ["localhost:9200"]
+  hosts: ["virtualhost:9900"]
 
   # Set gzip compression level.
   #compression_level: 0
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
   username: "elastic"
   password: "changeme"
-  protocol: "http"
 
   # Dictionary of HTTP parameters to pass within the url with index operations.
   #parameters:
@@ -159,7 +156,7 @@ output.elasticsearch:
   #template.path: "${path.config}/rsbeat.template.json"
 
   # Overwrite existing template
-  #template.overwrite: false
+  template.overwrite: true
 
   # If set to true, rsbeat checks the Elasticsearch version at connect time, and if it
   # is 2.x, it loads the file specified by the template.versions.2x.path setting. The
@@ -523,12 +520,12 @@ output.elasticsearch:
 
 
 #----------------------------- Console output ---------------------------------
-output.console:
+#output.console:
   # Boolean flag to enable or disable the output module.
-  enabled: true
+  #enabled: true
 
   # Pretty print json event
-  pretty: true 
+  #pretty: false
 
 #================================= Paths ======================================
 
@@ -600,8 +597,3 @@ logging.files:
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
 
-#elasticsearch:
-#    username: `Your username here`
-#    password: `Your password here`
-#    protocol: `Choose your protocol here (http or https)`
-#    hosts: `Array of Elasticsearch hosts like ["elasticsearch.example.com:9200"] `

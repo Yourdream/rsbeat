@@ -140,5 +140,10 @@ PLEASE UPDATE DOCUMENTATION
 [float]
 === cmd
 
-type: text
+type: keyword
+
+[float]
+=== key
+
+type: keyword
 

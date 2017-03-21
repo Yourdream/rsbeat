@@ -45,14 +45,17 @@
           }
         },
         "cmd": {
-          "index": "analyzed",
-          "norms": {
-            "enabled": false
-          },
+          "ignore_above": 1024,
+          "index": "not_analyzed",
           "type": "string"
         },
         "counter": {
           "type": "long"
+        },
+        "key": {
+          "ignore_above": 1024,
+          "index": "not_analyzed",
+          "type": "string"
         },
         "meta": {
           "properties": {

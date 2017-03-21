@@ -46,10 +46,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
-type redisInstance struct {
-	ip string
-	port string
-}
 func (bt *Rsbeat) Run(b *beat.Beat) error {
 	logp.Info("rsbeat is running! Hit CTRL-C to stop it.")
 
@@ -162,6 +158,7 @@ func (bt *Rsbeat ) redisc( beatname string, init bool, c redis.Conn , ipPort str
 func poolInit(server string , password string , slowerThan int ) (*redis.Pool) {
 	return &redis.Pool{
 		MaxIdle: 3,
+		MaxActive: 3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func () (redis.Conn, error) {
 			c, err := redis.Dial("tcp", server)

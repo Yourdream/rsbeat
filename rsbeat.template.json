@@ -39,11 +39,15 @@
           }
         },
         "cmd": {
-          "norms": false,
-          "type": "text"
+          "ignore_above": 1024,
+          "type": "keyword"
         },
         "counter": {
           "type": "long"
+        },
+        "key": {
+          "ignore_above": 1024,
+          "type": "keyword"
         },
         "meta": {
           "properties": {

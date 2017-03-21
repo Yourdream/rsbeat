@@ -8,6 +8,6 @@
       description: >
         PLEASE UPDATE DOCUMENTATION
     - name: cmd
-      type: text
+      type: keyword
     - name: key
-      type: text
+      type: keyword
