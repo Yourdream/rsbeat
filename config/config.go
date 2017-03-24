@@ -8,7 +8,7 @@ import "time"
 type Config struct {
 	Period     time.Duration `config:"period"`
 	Redis      []string      `config:"redis"`
-	SlowerThan int           `config:slowerThan`
+	SlowerThan int           `config:"slowerThan"`
 }
 
 var DefaultConfig = Config{
