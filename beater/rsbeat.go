@@ -166,6 +166,8 @@ func poolInit(server string, password string, slowerThan int) *redis.Pool {
 				return nil, err
 			}
 			c.Do("CONFIG", "SET", "slowlog-log-slower-than", slowerThan)
+			c.Do("CONFIG", "SET", "slowlog-max-len", 500)
+			c.Send("SLOWLOG", "RESET")
 			logp.Info("redis: config set")
 			/*			if _, err := c.Do("AUTH", password); err != nil {
 						c.Close()

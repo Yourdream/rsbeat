@@ -7,3 +7,4 @@
 *.pyc
 vendor
 logs
+rsbeat.yml
