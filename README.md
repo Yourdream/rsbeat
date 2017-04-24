@@ -37,7 +37,7 @@ Description
 ===========
 Rsbeat use `slowlog get` command to read slow log. The following image shows the key flow.
 
-![rsbeat flow](./rsbeat.png)
+![rsbeat flow](rsbeat.png)
 
 1. Rsbeat connects to every redis server and send the following commands.
 ```shell
