@@ -128,13 +128,23 @@ None
 
 
 [float]
-=== counter
+=== slow_id
 
 type: long
 
 required: True
 
-PLEASE UPDATE DOCUMENTATION
+A unique progressive identifier for every slow log entry.
+
+
+[float]
+=== @log_timestamp
+
+type: date
+
+required: True
+
+The unix timestamp at which the logged command was processed.
 
 
 [float]
@@ -142,8 +152,44 @@ PLEASE UPDATE DOCUMENTATION
 
 type: keyword
 
+required: True
+
+The logged command name.
+
+
 [float]
 === key
 
 type: keyword
+
+The logged command key.
+
+
+[float]
+=== args
+
+type: keyword
+
+The logged command arguments
+
+
+[float]
+=== ip_port
+
+type: keyword
+
+required: True
+
+Redis server host ip and port
+
+
+[float]
+=== duration
+
+type: long
+
+required: True
+
+The amount of time needed for its execution, in microseconds.
+
 

@@ -16,6 +16,7 @@ Table of Contents
     * [Run](#run)
     * [Docker](#docker)
 * [Exported Fields](#exported-fields)
+* [Kibana Dashboard](#kibana-dashboard)
 * [Author](#author)
 
 Status
@@ -139,6 +140,13 @@ Every entry is composed of four fields coresponding to rsbeat exported fields:
 * `extraTime`: The unix timestamp at which the logged command was processed.
 * `duration`: The amount of time needed for its execution, in microseconds.
 * `cmd` `key` `args`: The array composing the arguments of the command.
+
+Kibana Dashboard
+================
+Rsbeat has a prebuilt dashboard for you to analyze your slow log quickly.
+ ![rsbeat-dashboard](rsbeat-dashboard.png)
+ 
+ Go to Kibana Management Menu and import `rsbeat-dashboard.json` to `Saved Objects`.
 
 Author
 ======

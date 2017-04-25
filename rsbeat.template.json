@@ -5,8 +5,9 @@
         "norms": false
       },
       "_meta": {
-        "version": "5.1.3"
+        "version": "5.3.2"
       },
+      "date_detection": false,
       "dynamic_templates": [
         {
           "strings_as_keyword": {
@@ -19,8 +20,15 @@
         }
       ],
       "properties": {
+        "@log_timestamp": {
+          "type": "date"
+        },
         "@timestamp": {
           "type": "date"
+        },
+        "args": {
+          "ignore_above": 1024,
+          "type": "keyword"
         },
         "beat": {
           "properties": {
@@ -42,8 +50,15 @@
           "ignore_above": 1024,
           "type": "keyword"
         },
-        "counter": {
+        "duration": {
           "type": "long"
+        },
+        "fields": {
+          "properties": {}
+        },
+        "ip_port": {
+          "ignore_above": 1024,
+          "type": "keyword"
         },
         "key": {
           "ignore_above": 1024,
@@ -81,6 +96,9 @@
             }
           }
         },
+        "slow_id": {
+          "type": "long"
+        },
         "tags": {
           "ignore_above": 1024,
           "type": "keyword"
@@ -90,6 +108,7 @@
   },
   "order": 0,
   "settings": {
+    "index.mapping.total_fields.limit": 10000,
     "index.refresh_interval": "5s"
   },
   "template": "rsbeat-*"

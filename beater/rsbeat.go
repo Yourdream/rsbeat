@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/garyburd/redigo/redis"
-	"github.com/liugaohua/rsbeat/config"
+	"github.com/yourdream/rsbeat/config"
 )
 
 type Rsbeat struct {
@@ -32,10 +32,9 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	logp.Info("config.slowerThan: %v", config.SlowerThan)
 	var poolList = make(map[string]*redis.Pool)
 	for _, ipPort := range config.Redis {
-		poolList[ipPort] = poolInit(ipPort, "", config.SlowerThan)
+		poolList[ipPort] = poolInit(ipPort, config.SlowerThan)
 		logp.Info("redis: %s", ipPort)
 	}
-	//fmt.Printf("%q\n", poolList)
 
 	bt := &Rsbeat{
 		done:     make(chan struct{}),
@@ -51,7 +50,6 @@ func (bt *Rsbeat) Run(b *beat.Beat) error {
 
 	bt.client = b.Publisher.Connect()
 	ticker := time.NewTicker(bt.config.Period)
-	counter := 1
 	for {
 		select {
 		case <-bt.done:
@@ -59,20 +57,11 @@ func (bt *Rsbeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
-		/*		event := common.MapStr{
-					"@timestamp": common.Time(time.Now()),
-					"type":       b.Name,
-					"counter":    counter,
-				}
-				bt.client.PublishEvent(event)
-		*/
 		for ipPort, pool := range bt.poolList {
 			logp.Info("Event sent instance:%s", ipPort)
 			go bt.redisc(b.Name, true, pool.Get(), ipPort)
 		}
 		bt.lastIndexTime = time.Now()
-		logp.Info("Event sent. counter:%d", counter)
-		counter++
 	}
 }
 
@@ -91,19 +80,12 @@ type itemLog struct {
 }
 
 func (bt *Rsbeat) redisc(beatname string, init bool, c redis.Conn, ipPort string) {
-	/*	c, err := redis.Dial("tcp", "192.168.33.10:6379")
-		if err != nil {
-			fmt.Println(err)
-			return
-		}*/
 	defer c.Close()
 	logp.Info("conn:%v", c)
 
-	//c.Do("CONFIG", "SET", "slowlog-log-slower-than", "10")
-	//reply , err := redis.Values(c.Do("slowlog", "get", 30 ))
 	c.Send("SLOWLOG", "GET")
 	c.Send("SLOWLOG", "RESET")
-	logp.Info("redis: slowlog get. slowlog rest")
+	logp.Info("redis: slowlog get. slowlog reset")
 
 	c.Flush()
 	reply, err := redis.Values(c.Receive()) // reply from GET
@@ -111,7 +93,6 @@ func (bt *Rsbeat) redisc(beatname string, init bool, c redis.Conn, ipPort string
 
 	logp.Info("reply len: %d", len(reply))
 
-	now := time.Now()
 	for _, i := range reply {
 		rp, _ := redis.Values(i, err)
 		var itemLog itemLog
@@ -127,56 +108,48 @@ func (bt *Rsbeat) redisc(beatname string, init bool, c redis.Conn, ipPort string
 		if argsLen >= 3 {
 			itemLog.args = args[2:]
 		}
+		logp.Info("timestamp is: %d", itemLog.timestamp)
 		t := time.Unix(itemLog.timestamp, 0).UTC()
-		extraTime := t.Format("2006-01-02T15:04:05Z07:00")
-		//extraTime := time.Date( 0, 0, 0, 0, 0, itemLog.timestamp, 0, time.UTC)
-		//fmt.Println(itemLog.slowId, t, itemLog.duration, itemLog.cmd, itemLog.key, itemLog.args)
+
 		event := common.MapStr{
-			//"_id":       itemLog.slowId,
-			"type":       beatname,
-			"@timestamp": common.Time(t),
-			"slowId":     itemLog.slowId,
-			"cmd":        itemLog.cmd,
-			"key":        itemLog.key,
-			"args":       itemLog.args,
-			"duration":   itemLog.duration,
-			"ipPort":     ipPort,
-			"extraTime":  extraTime,
+			"type":           beatname,
+			"@timestamp":     common.Time(time.Now()),
+			"@log_timestamp": common.Time(t),
+			"slow_id":        itemLog.slowId,
+			"cmd":            itemLog.cmd,
+			"key":            itemLog.key,
+			"args":           itemLog.args,
+			"duration":       itemLog.duration,
+			"ip_port":        ipPort,
 		}
-		if init {
-			// index all files and directories on init
-			bt.client.PublishEvent(event)
-		} else {
-			// Index only changed files since last run.
-			if now.After(bt.lastIndexTime) {
-				bt.client.PublishEvent(event)
-			}
-		}
+
+		bt.client.PublishEvent(event)
 	}
 }
 
-func poolInit(server string, password string, slowerThan int) *redis.Pool {
+func poolInit(server string, slowerThan int) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
 		MaxActive:   3,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", server)
+			c, err := redis.Dial("tcp", server, redis.DialConnectTimeout(3*time.Second), redis.DialReadTimeout(3*time.Second))
 			if err != nil {
+				logp.Err("redis: error occurs when connect %v", err.Error())
 				return nil, err
 			}
-			c.Do("CONFIG", "SET", "slowlog-log-slower-than", slowerThan)
-			c.Do("CONFIG", "SET", "slowlog-max-len", 500)
+			c.Send("MULTI")
+			c.Send("CONFIG", "SET", "slowlog-log-slower-than", slowerThan)
+			c.Send("CONFIG", "SET", "slowlog-max-len", 500)
 			c.Send("SLOWLOG", "RESET")
-			logp.Info("redis: config set")
-			/*			if _, err := c.Do("AUTH", password); err != nil {
-						c.Close()
-						return nil, err
-					}*/
-			//if _, err := c.Do("SELECT",1); err != nil {
-			// c.Close()
-			// return nil, err
-			//}
+			r, err := c.Do("EXEC")
+
+			if err != nil {
+				logp.Err("redis: error occurs when send config set %v", err.Error())
+				return nil, err
+			}
+
+			logp.Info("redis: config set %v", r)
 			return c, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {

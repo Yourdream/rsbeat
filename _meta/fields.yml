@@ -2,12 +2,36 @@
   title: rsbeat
   description:
   fields:
-    - name: counter
+    - name: slow_id
       type: long
       required: true
       description: >
-        PLEASE UPDATE DOCUMENTATION
+        A unique progressive identifier for every slow log entry.
+    - name: '@log_timestamp'
+      type: date
+      required: true
+      description: >
+        The unix timestamp at which the logged command was processed.
     - name: cmd
       type: keyword
+      required: true
+      description: >
+        The logged command name.
     - name: key
       type: keyword
+      description: >
+        The logged command key.
+    - name: args
+      type: keyword
+      description: >
+        The logged command arguments
+    - name: ip_port
+      type: keyword
+      required: true
+      description: >
+        Redis server host ip and port
+    - name: duration
+      type: long
+      required: true
+      description: >
+        The amount of time needed for its execution, in microseconds.
