@@ -48,7 +48,10 @@ slowlog reset #tell redis to clear current slow log records
 ```
 2. Rsbeat periodically pull slow log from redis.
 3. Rsbeat publish all slow log events to elasticsearch.
-4. User can analyze all slow log events through Kibana. Rsbeat has already provided the useful kibana dashboard which user can import directly to kibana.
+4. User can analyze all slow log events through Kibana. Rsbeat has already provided a useful kibana dashboard which user can import directly to kibana.
+
+[Back to TOC](#table-of-contents)
+
 
 Usage
 =====
@@ -71,6 +74,9 @@ To run rsbeat with debugging output enabled, run:
 ./rsbeat -c rsbeat.yml -e -d "*"
 ```
 
+[Back to TOC](#table-of-contents)
+
+
 Config
 ======
 Rsbeat has the following config fields.
@@ -85,6 +91,8 @@ rsbeat:
 * rsbeat.redis: Defines redis server list.
 * rsbeat.slowerThan: Defines time in microseconds which is sent to redis server by command `config set slowlog-log-slower-than`.
 
+[Back to TOC](#table-of-contents)
+
 Run
 ===
 Firstly, run rsbeat.
@@ -96,6 +104,8 @@ Firstly, run rsbeat.
 Secondly, import kibana dashboard.
 
 Enjoy your travel to redis slow log now!
+
+[Back to TOC](#table-of-contents)
 
 Exported Fields
 =====
@@ -141,12 +151,16 @@ Every entry is composed of four fields coresponding to rsbeat exported fields:
 * `duration`: The amount of time needed for its execution, in microseconds.
 * `cmd` `key` `args`: The array composing the arguments of the command.
 
+[Back to TOC](#table-of-contents)
+
 Kibana Dashboard
 ================
 Rsbeat has a prebuilt dashboard for you to analyze your slow log quickly.
  ![rsbeat-dashboard](rsbeat-dashboard.png)
  
  Go to Kibana Management Menu and import `rsbeat-dashboard.json` to `Saved Objects`.
+
+[Back to TOC](#table-of-contents)
 
 Author
 ======
