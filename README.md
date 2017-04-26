@@ -107,6 +107,53 @@ Enjoy your travel to redis slow log now!
 
 [Back to TOC](#table-of-contents)
 
+Docker
+===
+We use [docker-compose](https://docs.docker.com/compose/compose-file/compose-file-v2/) for our docker environment, so we have put a **docker-compose.yml** file under the project root directory.
+There are two docker images we declared in our docker-compose file :
+- elasticsearch
+- kibana
+
+Firstly, *change to the project root directory*.
+```
+cd ./rsbeat
+```
+Then we can *build the containers and start up our services*
+```
+docker-compose up
+```
+Or we can *run it daemonize*
+```
+docker-compose up -d
+```
+And *show container status*
+```
+➜ docker-compose ps
+         Name                       Command               State                       Ports
+----------------------------------------------------------------------------------------------------------------
+rsbeat_elasticsearch_1   /docker-entrypoint.sh elas ...   Up      0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp
+rsbeat_kibana_1          /docker-entrypoint.sh kibana     Up      0.0.0.0:5601->5601/tcp
+```
+Now we can visit our kibana dashboard on browser with this address **http://127.0.0.1:5601**
+
+Once you need to *stop the service* , just run under the project root directory
+```
+docker-compose stop
+```
+Or *start it again*
+```
+docker-compose start
+```
+You can also *destroy the containers* with
+```
+docker-compose down
+```
+
+Check about [docker-compose cli reference](https://docs.docker.com/compose/reference/overview/) for more details
+
+
+[Back to TOC](#table-of-contents)
+
 Exported Fields
 =====
 Following is the exported fields.
@@ -167,3 +214,4 @@ Author
 * [Lau](https://github.com/liugaohua)
 * [Leon J](https://github.com/jyj1993126)
 * [Rockybean](https://github.com/rockybean)
+
