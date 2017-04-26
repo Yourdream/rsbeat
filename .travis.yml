@@ -10,7 +10,6 @@ go:
 
 os:
   - linux
-  - osx
 
 env:
   matrix:
