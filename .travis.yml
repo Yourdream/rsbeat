@@ -37,6 +37,7 @@ before_install:
 
 install:
   - go get github.com/elastic/beats/libbeat
+  - go get github.com/garyburd/redigo/redis
   - make setup
 
 script:
