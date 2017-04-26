@@ -6,7 +6,7 @@ services:
 language: go
 
 go:
-  - 1.6
+  - 1.7
 
 os:
   - linux
@@ -25,16 +25,20 @@ addons:
   apt:
     packages:
       - python-virtualenv
+      - glide
+    sources:
+      - sourceline: 'ppa:masterminds/glide'
 
 before_install:
   # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
   - mkdir -p $HOME/gopath/src/github.com/liugaohua/rsbeat/
-  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/liugaohua/rsbeat/
-  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/liugaohua/rsbeat/
-  - cd $HOME/gopath/src/github.com/liugaohua/rsbeat/
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/yourdream/rsbeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/yourdream/rsbeat/
+  - cd $HOME/gopath/src/github.com/yourdream/rsbeat/
 
 install:
-  - true
+  - go get github.com/elastic/beats/libbeat
+  - make setup
 
 script:
   - make $TARGETS
