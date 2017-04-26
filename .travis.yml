@@ -31,7 +31,7 @@ addons:
 
 before_install:
   # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
-  - mkdir -p $HOME/gopath/src/github.com/liugaohua/rsbeat/
+  - mkdir -p $HOME/gopath/src/github.com/yourdream/rsbeat/
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/yourdream/rsbeat/
   - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/yourdream/rsbeat/
   - cd $HOME/gopath/src/github.com/yourdream/rsbeat/
