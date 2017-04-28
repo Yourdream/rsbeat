@@ -1,6 +1,15 @@
 version: '2'
 
 services:
+    rsbeat_application:
+      image: tianon/true
+      volumes:
+         - ../:/app
+
+    rsbeat:
+       build: .
+       volumes_from:
+          - rsbeat_application
 
     elasticsearch:
         image: elasticsearch
@@ -8,8 +17,7 @@ services:
             - elasticdata:/usr/share/elasticsearch/data
         ports:
             - "9200:9200"
-            - "9300:9300"
-    
+
     kibana:
         image: kibana
         links:

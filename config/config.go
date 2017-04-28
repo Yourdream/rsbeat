@@ -13,6 +13,6 @@ type Config struct {
 
 var DefaultConfig = Config{
 	Period:     1 * time.Second,
-	Redis:      []string{"192.168.33.10:16379"},
+	Redis:      []string{"127.0.0.1:6379"},
 	SlowerThan: 100, //ms
 }

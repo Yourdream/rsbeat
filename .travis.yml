@@ -41,6 +41,7 @@ install:
   - make setup
 
 script:
+
   - make $TARGETS
 
 after_success:
