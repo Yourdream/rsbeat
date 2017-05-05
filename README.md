@@ -34,7 +34,6 @@ The current version is 5.3.2.
 Requirements
 ============
 * [Golang](https://golang.org/dl/) 1.7
-* ElasticStack 5.x
 
 Description
 ===========
