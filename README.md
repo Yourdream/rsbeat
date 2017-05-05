@@ -110,48 +110,50 @@ Enjoy your travel to redis slow log now!
 [Back to TOC](#table-of-contents)
 
 Docker
-===
-We use [docker-compose](https://docs.docker.com/compose/compose-file/compose-file-v2/) for our docker environment, so we have put a **docker-compose.yml** file under the project root directory.
-There are two docker images we declared in our docker-compose file :
-- elasticsearch
-- kibana
+======
+We use [docker-compose](https://docs.docker.com/compose/compose-file/compose-file-v2/) for our docker environment, so we have put a **docker-compose.yml** file under the project `docker` directory.
 
-Firstly, *change to the project root directory*.
+Usage is very simple.
+ 
+First step: Start kibana
 ```
-cd ./rsbeat
-```
-Then we can *build the containers and start up our services*
-```
-docker-compose up
-```
-Or we can *run it daemonize*
-```
-docker-compose up -d
-```
-And *show container status*
-```
-➜ docker-compose ps
-         Name                       Command               State                       Ports
-----------------------------------------------------------------------------------------------------------------
-rsbeat_elasticsearch_1   /docker-entrypoint.sh elas ...   Up      0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp
-rsbeat_kibana_1          /docker-entrypoint.sh kibana     Up      0.0.0.0:5601->5601/tcp
-```
-Now we can visit our kibana dashboard on browser with this address **http://127.0.0.1:5601**
-
-Once you need to *stop the service* , just run under the project root directory
-```
-docker-compose stop
-```
-Or *start it again*
-```
-docker-compose start
-```
-You can also *destroy the containers* with
-```
-docker-compose down
+cd docker
+docker-compose start kibana
 ```
 
-Check about [docker-compose cli reference](https://docs.docker.com/compose/reference/overview/) for more details
+Connect to `http://127.0.0.1:5601`, you should see kibana interface.
+
+Second step: Download latest rsbeat and run rsbeat
+```
+cd docker
+curl -fsSL 'https://github.com/Yourdream/rsbeat/releases/download/v5.3.2/rsbeat-linux-amd64' -o rsbeat-linux-amd64
+docker-compose build rsbeat
+docker-compose run -e "REDIS_LIST=\"10.0.0.40:6379\"" rsbeat
+```
+
+Now you should see logs in console output.
+
+`REDIS_LIST` is the redis instance you wish to monitor. You can specify more instances like this `REDIS_LIST=\"10.0.0.40:6379\",\"10.0.0.21:6379\"`. But DO NOT USE `127.0.0.1` or `localhost` host because the docker container network archetecture cannot connect to service in host machine.
+
+The other environment variables are as belows:
+
+1. `PERIOD` defines how often an event is sent to the output. For example `-e "PERIOD=2s"`. The default value is `1s`.
+2. `ES_URL` specify the elasticsearch url. For example `-e "ES_URL=10.0.0.20:9200"`. The default value is `elasticsearch:9200` which is the elasticsearch service in docker.
+3. `REDIS_SLOWER_THAN` defines time in microseconds which is sent to redis server by command `config set slowlog-log-slower-than`. The default value is `100`.
+
+
+Third step: Configure kibana
+
+1. Add `rsbeat-*` index template to kibana and use `@log_timestamp` as the `Time-field name`.
+2. Import rsbeat-dashboard.json in project root directory in kibana `Management` -> `Saved Objects` page.
+3. Go to dashboard and choose `rsbeat-analysis`. 
+
+Enjoy it!
+Check about [docker-compose cli reference](https://docs.docker.com/compose/reference/overview/), [elasticsearch docker reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html), [kibana docker reference](https://www.elastic.co/guide/en/kibana/current/docker.html) for more details.
+
+
+
+
 
 
 [Back to TOC](#table-of-contents)

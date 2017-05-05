@@ -158,6 +158,7 @@ output.elasticsearch:
   # Path to template file
   #template.path: "${path.config}/rsbeat.template.json"
 
+
   # Overwrite existing template
   #template.overwrite: false
 
@@ -573,7 +574,7 @@ output.elasticsearch:
 #dashboards.directory:
 
 # The file archive (zip file) from where to read the dashboards. It is used instead
-# of the URL when it has a value.
+# of the URL when it has a value
 #dashboards.file:
 
 # If this option is enabled, the snapshot URL is used instead of the default URL.
